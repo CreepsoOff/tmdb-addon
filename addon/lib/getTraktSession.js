@@ -5,25 +5,25 @@ const TRAKT_CLIENT_ID = process.env.TRAKT_CLIENT_ID
 const TRAKT_CLIENT_SECRET = process.env.TRAKT_CLIENT_SECRET
 
 /**
- * Obtém o redirect URI baseado no host da requisição ou variável de ambiente
- * @param {string} requestHost - Host da requisição (ex: https://meu-dominio.com)
- * @returns {string} - Redirect URI completo
+ * Get the redirect URI based on the request host or environment variable
+ * @param {string} requestHost - Request host (e.g.: https://my-domain.com)
+ * @returns {string} - Full redirect URI
  */
 function getRedirectUri(requestHost = null) {
-  // Se foi passado um host na requisição, usa ele
+  // If a host was passed in the request, use it
   if (requestHost) {
-    // Remove trailing slash se existir
+    // Remove trailing slash if present
     const baseUrl = requestHost.replace(/\/$/, '')
     return `${baseUrl}/configure`
   }
-  
-  // Fallback para variável de ambiente ou padrão
+
+  // Fallback to environment variable or default
   return process.env.TRAKT_REDIRECT_URI || `${process.env.HOST_NAME || 'http://localhost:1337'}/configure`
 }
 
 async function getTraktAuthUrl(requestHost = null) {
   if (!TRAKT_CLIENT_ID) {
-    throw new Error('TRAKT_CLIENT_ID não configurado')
+    throw new Error('TRAKT_CLIENT_ID not configured')
   }
 
   const redirectUri = getRedirectUri(requestHost)
@@ -39,7 +39,7 @@ async function getTraktAccessToken(code, redirectUri = null) {
     throw new Error('TRAKT_CLIENT_ID ou TRAKT_CLIENT_SECRET não configurados')
   }
 
-  // Usa o redirect_uri fornecido ou o padrão
+  // Use the provided redirect_uri or the default
   const finalRedirectUri = redirectUri || getRedirectUri()
 
   try {
@@ -57,17 +57,17 @@ async function getTraktAccessToken(code, redirectUri = null) {
 
     return response.data || response
   } catch (err) {
-    console.error('Erro ao obter access token do Trakt:', err)
-    return { success: false, error: err.message || 'Erro ao autenticar com Trakt' }
+    console.error('Error obtaining Trakt access token:', err)
+    return { success: false, error: err.message || 'Error authenticating with Trakt' }
   }
 }
 
 async function refreshTraktAccessToken(refreshToken, redirectUri = null) {
   if (!TRAKT_CLIENT_ID || !TRAKT_CLIENT_SECRET) {
-    throw new Error('TRAKT_CLIENT_ID ou TRAKT_CLIENT_SECRET não configurados')
+    throw new Error('TRAKT_CLIENT_ID or TRAKT_CLIENT_SECRET not configured')
   }
 
-  // Usa o redirect_uri fornecido ou o padrão
+  // Use the provided redirect_uri or the default
   const finalRedirectUri = redirectUri || getRedirectUri()
 
   try {
@@ -85,8 +85,8 @@ async function refreshTraktAccessToken(refreshToken, redirectUri = null) {
 
     return response.data || response
   } catch (err) {
-    console.error('Erro ao renovar access token do Trakt:', err)
-    return { success: false, error: err.message || 'Erro ao renovar token do Trakt' }
+    console.error('Error refreshing Trakt access token:', err)
+    return { success: false, error: err.message || 'Error refreshing Trakt token' }
   }
 }
 

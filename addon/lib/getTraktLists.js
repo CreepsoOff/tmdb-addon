@@ -4,7 +4,7 @@ const { getMeta } = require('./getMeta')
 
 async function getTraktWatchlist(type, language, page, genre, accessToken) {
   if (!accessToken) {
-    throw new Error('Access token do Trakt não fornecido')
+    throw new Error('Trakt access token not provided')
   }
 
   try {
@@ -38,20 +38,20 @@ async function getTraktWatchlist(type, language, page, genre, accessToken) {
           metas.push(meta.meta)
         }
       } catch (err) {
-        console.error(`Erro ao processar item do Trakt:`, err)
+        console.error(`Error processing Trakt item:`, err)
       }
     }
 
     return { metas }
   } catch (err) {
-    console.error('Erro ao buscar watchlist do Trakt:', err)
+    console.error('Error fetching Trakt watchlist:', err)
     throw err
   }
 }
 
 async function getTraktRecommendations(type, language, page, genre, accessToken) {
   if (!accessToken) {
-    throw new Error('Access token do Trakt não fornecido')
+    throw new Error('Trakt access token not provided')
   }
 
   try {
@@ -79,13 +79,13 @@ async function getTraktRecommendations(type, language, page, genre, accessToken)
           metas.push(meta.meta)
         }
       } catch (err) {
-        console.error(`Erro ao processar recomendação do Trakt:`, err)
+        console.error(`Error processing Trakt recommendation:`, err)
       }
     }
 
     return { metas }
   } catch (err) {
-    console.error('Erro ao buscar recomendações do Trakt:', err)
+    console.error('Error fetching Trakt recommendations:', err)
     throw err
   }
 }

@@ -16,13 +16,13 @@ export default function Trakt() {
     setError("");
     try {
       if (!code || code.trim() === '') {
-        throw new Error('Código de autorização inválido');
+        throw new Error('Invalid authorization code');
       }
       
       const response = await fetch(`/trakt_access_token?code=${encodeURIComponent(code)}`);
       
       if (!response.ok) {
-        let errorMessage = 'Falha ao obter token de acesso';
+        let errorMessage = 'Failed to obtain access token';
         try {
           const errorData = await response.json();
           errorMessage = errorData.error || errorMessage;
@@ -35,14 +35,14 @@ export default function Trakt() {
       
       const tokenData = await response.json();
       
-      // Verifica se a resposta é um JSON com erro
+      // Check if the response is a JSON with an error
       if (tokenData.error || tokenData.success === false) {
-        throw new Error(tokenData.error || tokenData.status_message || 'Falha ao obter token de acesso');
+        throw new Error(tokenData.error || tokenData.status_message || 'Failed to obtain access token');
       }
       
-      // Valida se o access token não está vazio
+      // Validate that the access token is not empty
       if (!tokenData.access_token || tokenData.access_token.trim() === '') {
-        throw new Error('Token de acesso vazio recebido');
+        throw new Error('Received empty access token');
       }
       
       setTraktAccessToken(tokenData.access_token);
@@ -50,7 +50,7 @@ export default function Trakt() {
         setTraktRefreshToken(tokenData.refresh_token);
       }
 
-      // Adiciona os catálogos do Trakt se ainda não existirem
+      // Add Trakt catalogs if they don't already exist
       const traktCatalogsToAdd = [
         {
           id: "trakt.watchlist",
@@ -88,7 +88,7 @@ export default function Trakt() {
           (c) => !existingIds.has(`${c.id}-${c.type}`)
         );
         
-        // Se já existem, apenas atualiza o enabled/showInHome para true
+        // If they already exist, just set enabled/showInHome to true
         const updatedCatalogs = prev.map((c) => {
           const traktCatalog = traktCatalogsToAdd.find(
             (tc) => tc.id === c.id && tc.type === c.type
@@ -103,14 +103,14 @@ export default function Trakt() {
       });
 
       toast({
-        title: "Conta Trakt conectada",
-        description: "Sua watchlist e recomendações foram sincronizadas.",
+        title: "Trakt account connected",
+        description: "Your watchlist and recommendations have been synced.",
       });
       
       window.history.replaceState({}, '', window.location.pathname);
     } catch (e) {
       console.error(e);
-      setError(e instanceof Error ? e.message : "Falha ao conectar conta Trakt");
+      setError(e instanceof Error ? e.message : "Failed to connect Trakt account");
     } finally {
       setIsLoading(false);
     }
@@ -133,7 +133,7 @@ export default function Trakt() {
       const response = await fetch(`/trakt_auth_url`);
       
       if (!response.ok) {
-        let errorMessage = 'Falha ao obter URL de autenticação';
+        let errorMessage = 'Failed to obtain authentication URL';
         try {
           const errorData = await response.json();
           errorMessage = errorData.error || errorMessage;
@@ -146,16 +146,16 @@ export default function Trakt() {
       
       const data = await response.json();
       
-      // Valida se a URL não está vazia
+      // Validate that the URL is not empty
       if (!data.authUrl || data.authUrl.trim() === '') {
-        throw new Error('URL de autenticação vazia recebida');
+        throw new Error('Received empty authentication URL');
       }
-      
-      // Redireciona para a página de autenticação do Trakt
+
+      // Redirect to the Trakt authentication page
       window.location.href = data.authUrl;
     } catch (e) {
       console.error(e);
-      setError(e instanceof Error ? e.message : "Falha ao iniciar autenticação Trakt");
+      setError(e instanceof Error ? e.message : "Failed to start Trakt authentication");
       setIsLoading(false);
     }
   };
@@ -164,12 +164,12 @@ export default function Trakt() {
     setTraktAccessToken("");
     setTraktRefreshToken("");
     
-    // Remove os catálogos do Trakt
+    // Remove Trakt catalogs
     setCatalogs((prev) => prev.filter((c) => !c.id.startsWith("trakt.")));
 
     toast({
-      title: "Conta Trakt desconectada",
-      description: "Sua conta Trakt foi desconectada com sucesso.",
+      title: "Trakt account disconnected",
+      description: "Your Trakt account has been disconnected successfully.",
     });
   };
 
@@ -186,13 +186,13 @@ export default function Trakt() {
         {traktAccessToken ? (
           <div className="flex flex-col items-center space-y-4">
             <Alert>
-              <AlertDescription>
-                Você está conectado ao Trakt
+                <AlertDescription>
+                You are connected to Trakt
               </AlertDescription>
             </Alert>
             <DialogClose asChild>
               <Button variant="destructive" onClick={handleLogout}>
-                Desconectar
+                Disconnect
               </Button>
             </DialogClose>
           </div>
@@ -205,10 +205,10 @@ export default function Trakt() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Conectando ao Trakt...
+                Connecting to Trakt...
               </>
             ) : (
-              'Conectar com Trakt'
+              'Connect with Trakt'
             )}
           </Button>
         )}
