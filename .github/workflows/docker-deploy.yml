@@ -22,9 +22,9 @@ jobs:
       - name: Set tag name
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+            echo "TAG=${{ github.event.inputs.tag }}-save" >> $GITHUB_ENV
           else
-            echo "TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+            echo "TAG=${{ github.ref_name }}-save" >> $GITHUB_ENV
           fi
 
       # Set up QEMU for multi-platform builds
