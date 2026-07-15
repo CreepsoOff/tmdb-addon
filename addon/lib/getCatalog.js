@@ -2,9 +2,8 @@ require("dotenv").config();
 const { getTmdbClient } = require("../utils/getTmdbClient");
 const { getGenreList } = require("./getGenreList");
 const { getLanguages } = require("./getLanguages");
-const { parseMedia } = require("../utils/parseProps");
+const { getCatalogPreview } = require("./getCatalogPreview");
 const { fetchMDBListItems, parseMDBListItems } = require("../utils/mdbList");
-const { getMeta } = require("./getMeta");
 const { isMovieReleasedInRegion, isMovieReleasedDigitally } = require("./releaseFilter");
 const { rateLimitedMapFiltered } = require("../utils/rateLimiter");
 const CATALOG_TYPES = require("../static/catalog-types.json");
@@ -37,18 +36,9 @@ async function getCatalog(type, language, page, id, genre, config) {
   async function fetchAndFilter(params, regionForReleaseCheck) {
     const res = await fetchFunction(params);
 
-    // Use rate-limited fetching to prevent 429 errors
     let metas = await rateLimitedMapFiltered(
       res.results,
-      async (item) => {
-        try {
-          const result = await getMeta(type, language, item.id, config);
-          return result.meta;
-        } catch (err) {
-          console.error(`Error fetching metadata for ${item.id}:`, err.message);
-          return null;
-        }
-      },
+      item => getCatalogPreview(moviedb, item, type, language, genreList, config),
       { batchSize: 5, delayMs: 200 }
     );
 
